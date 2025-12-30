@@ -22,28 +22,39 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     const body = await request.json()
     const { status, admin_note } = body
 
-    // Validate status
     const validStatuses = ["pending", "completed", "failed", "reverted"]
     if (!validStatuses.includes(status)) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 })
     }
 
-    // Update transaction
-    const result = await sql(
-      `UPDATE transactions 
-       SET status = $1, description = CASE WHEN $2 IS NOT NULL THEN $2 ELSE description END
-       WHERE id = $3
-       RETURNING *`,
-      [status, admin_note || null, transactionId],
-    )
+    let query = `UPDATE transactions SET status = $1`
+    const params_array = [status]
+    let paramIndex = 2
+
+    // Only update description if admin_note is provided
+    if (admin_note) {
+      query += `, description = $${paramIndex}`
+      params_array.push(admin_note)
+      paramIndex++
+    }
+
+    query += ` WHERE id = $${paramIndex} RETURNING *`
+    params_array.push(transactionId)
+
+    console.log("[v0] Executing query:", query)
+    console.log("[v0] With params:", params_array)
+
+    const result = await sql(query, params_array)
 
     if (!result || result.length === 0) {
+      console.log("[v0] Transaction not found:", transactionId)
       return NextResponse.json({ error: "Transaction not found" }, { status: 404 })
     }
 
+    console.log("[v0] Transaction updated successfully:", result[0])
     return NextResponse.json({ transaction: result[0] })
   } catch (error) {
-    console.error("Error updating transaction:", error)
-    return NextResponse.json({ error: "Failed to update transaction" }, { status: 500 })
+    console.error("[v0] Error updating transaction:", error)
+    return NextResponse.json({ error: "Failed to update transaction", details: String(error) }, { status: 500 })
   }
 }
