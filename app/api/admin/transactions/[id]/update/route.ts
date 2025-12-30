@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { sql } from "@/lib/db"
-import { verifyToken } from "@/lib/auth"
+import { verifyAdminToken } from "@/lib/auth"
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   try {
@@ -9,8 +9,8 @@ export async function PATCH(request: Request, { params }: { params: { id: string
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const adminData = verifyToken(token)
-    if (!adminData || !adminData.is_admin) {
+    const admin = await verifyAdminToken(token)
+    if (!admin) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 

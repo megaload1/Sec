@@ -34,6 +34,28 @@ export function verifyToken(token: string) {
   }
 }
 
+export async function verifyAdminToken(token: string) {
+  const decoded = verifyToken(token)
+  if (!decoded) {
+    return null
+  }
+
+  try {
+    const users = await sql`
+      SELECT id, is_admin FROM users WHERE id = ${decoded.userId}
+    `
+
+    const user = users[0] || null
+    if (user && user.is_admin) {
+      return user
+    }
+    return null
+  } catch (error) {
+    console.error("Error verifying admin token:", error)
+    return null
+  }
+}
+
 export async function getUserFromToken(token: string) {
   const decoded = verifyToken(token)
   if (!decoded) {
