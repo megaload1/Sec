@@ -346,14 +346,14 @@ export default function Dashboard() {
     <div className="min-h-screen bg-slate-950 overflow-x-hidden">
       <CBNWarningNotification />
 
-      {/* Premium Header */}
-      <div className="sticky top-0 z-30 bg-slate-900/80 backdrop-blur-xl border-b border-slate-800/50 h-16">
-        <div className="flex items-center justify-between p-4 h-full max-w-7xl mx-auto">
-          <div className="flex items-center gap-3 min-w-0 flex-1">
+      {/* Header - CHANGE: reduced height and padding for mobile compactness */}
+      <div className="sticky top-0 z-30 bg-slate-900/80 backdrop-blur-xl border-b border-slate-800/50 h-14 sm:h-16">
+        <div className="flex items-center justify-between px-3 sm:px-4 h-full max-w-7xl mx-auto">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             <div className="min-w-0 flex-1">
-              <h1 className="text-base font-semibold text-white truncate">Welcome, {user.firstName}</h1>
+              <h1 className="text-sm sm:text-base font-semibold text-white truncate">Welcome, {user.firstName}</h1>
               <Badge
-                className={`text-xs mt-0.5 ${
+                className={`text-xs mt-0.5 inline-block ${
                   user.isActive
                     ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                     : "bg-amber-500/10 text-amber-400 border-amber-500/20"
@@ -363,21 +363,21 @@ export default function Dashboard() {
               </Badge>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <Button
               variant="ghost"
               size="sm"
-              className="text-slate-400 hover:text-white hover:bg-slate-800/50 p-2 relative"
+              className="text-slate-400 hover:text-white hover:bg-slate-800/50 p-1.5 sm:p-2 relative h-8 w-8 sm:h-9 sm:w-9"
             >
-              <Bell className="w-5 h-5" />
+              <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowSettingsModal(true)}
-              className="text-slate-400 hover:text-white hover:bg-slate-800/50 p-2"
+              className="text-slate-400 hover:text-white hover:bg-slate-800/50 p-1.5 sm:p-2 h-8 w-8 sm:h-9 sm:w-9"
             >
-              <Settings className="w-5 h-5" />
+              <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
             <Button
               onClick={() => {
@@ -386,22 +386,22 @@ export default function Dashboard() {
               }}
               variant="ghost"
               size="sm"
-              className="text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 p-2"
+              className="text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 p-1.5 sm:p-2 h-8 w-8 sm:h-9 sm:w-9"
             >
-              <Power className="w-5 h-5" />
+              <Power className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="p-4 space-y-6 max-w-7xl mx-auto pb-24">
+      {/* Main Content - CHANGE: reduced spacing and padding for mobile devices */}
+      <div className="px-3 sm:px-4 py-3 sm:py-4 space-y-4 sm:space-y-6 max-w-7xl mx-auto pb-24">
         {/* Countdown Timer */}
         {user.registrationCountdownEnd && (
           <CountdownTimer endTime={user.registrationCountdownEnd} onComplete={handleCountdownComplete} />
         )}
 
-        {/* Premium Wallet Card */}
+        {/* Premium Wallet Card - CHANGE: reduced padding and font sizes */}
         <Card className="bg-gradient-to-br from-slate-800/90 via-slate-800/80 to-slate-900/90 border-slate-700/50 shadow-xl backdrop-blur-sm overflow-hidden relative">
           <div className="absolute inset-0 opacity-[0.02]">
             <div
@@ -413,67 +413,73 @@ export default function Dashboard() {
             />
           </div>
 
-          <CardContent className="p-6 relative z-10">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-slate-700/50 rounded-xl backdrop-blur-sm border border-slate-600/30">
-                  <Wallet className="w-5 h-5 text-slate-300" />
+          <CardContent className="p-4 sm:p-6 relative z-10">
+            <div className="flex items-center justify-between mb-4 sm:mb-6 flex-col sm:flex-row gap-3 sm:gap-0">
+              <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                <div className="p-2 sm:p-2.5 bg-slate-700/50 rounded-lg sm:rounded-xl backdrop-blur-sm border border-slate-600/30 flex-shrink-0">
+                  <Wallet className="w-4 h-4 sm:w-5 sm:h-5 text-slate-300" />
                 </div>
-                <div>
-                  <p className="text-slate-300 text-sm font-medium">Available Balance</p>
+                <div className="min-w-0">
+                  <p className="text-slate-300 text-xs sm:text-sm font-medium">Available Balance</p>
                   <p className="text-slate-500 text-xs">Ready to transfer</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-end">
                 <Button
                   onClick={handleReloadDashboard}
                   disabled={reloading}
                   size="sm"
-                  className="bg-slate-700/50 hover:bg-slate-600/50 text-slate-200 border-0 h-9 px-3 backdrop-blur-sm"
+                  className="bg-slate-700/50 hover:bg-slate-600/50 text-slate-200 border-0 h-8 sm:h-9 px-2 sm:px-3 backdrop-blur-sm text-xs"
                 >
-                  <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${reloading ? "animate-spin" : ""}`} />
-                  <span className="text-xs">{reloading ? "Updating..." : "Refresh"}</span>
+                  <RefreshCw className={`w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 ${reloading ? "animate-spin" : ""}`} />
+                  <span className="hidden sm:inline">{reloading ? "Updating..." : "Refresh"}</span>
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowBalance(!showBalance)}
-                  className="text-slate-400 hover:text-white hover:bg-slate-700/50 p-2"
+                  className="text-slate-400 hover:text-white hover:bg-slate-700/50 p-1.5 sm:p-2 h-8 w-8 sm:h-9 sm:w-9"
                 >
-                  {showBalance ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showBalance ? (
+                    <EyeOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  ) : (
+                    <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  )}
                 </Button>
               </div>
             </div>
 
-            <div className="text-4xl font-bold text-white mb-8 tracking-tight">
+            <div className="text-2xl sm:text-4xl font-bold text-white mb-4 sm:mb-8 tracking-tight">
               {showBalance ? formatCurrency(safeNumber(user.walletBalance)) : "••••••••"}
             </div>
 
-            <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4">
               <Button
                 onClick={() => setShowSendModal(true)}
                 disabled={!user.isActive && user.walletBalance === 0}
-                className="w-full bg-slate-700 hover:bg-slate-600 text-white h-12 font-medium"
+                className="w-full bg-slate-700 hover:bg-slate-600 text-white h-10 sm:h-12 font-medium text-sm sm:text-base"
               >
-                <Send className="w-4 h-4 mr-2" />
-                Send Money
+                <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+                <span className="hidden sm:inline">Send Money</span>
+                <span className="sm:hidden">Send</span>
               </Button>
               <Button
                 onClick={handleTopUpWallet}
-                className="w-full bg-slate-700/50 hover:bg-slate-600/50 text-slate-200 border border-slate-600/30 h-12 font-medium backdrop-blur-sm"
+                className="w-full bg-slate-700/50 hover:bg-slate-600/50 text-slate-200 border border-slate-600/30 h-10 sm:h-12 font-medium text-sm sm:text-base backdrop-blur-sm"
               >
-                <CreditCard className="w-4 h-4 mr-2" />
-                Top Up Wallet
+                <CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+                <span className="hidden sm:inline">Top Up</span>
+                <span className="sm:hidden">Top Up</span>
               </Button>
             </div>
 
-            <div className="p-4 bg-gradient-to-r from-amber-500/5 via-amber-500/5 to-transparent rounded-xl border border-amber-500/10 backdrop-blur-sm">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-amber-500/10 rounded-lg flex-shrink-0 border border-amber-500/20">
-                  <Sparkles className="w-4 h-4 text-amber-400" />
+            <div className="p-3 sm:p-4 bg-gradient-to-r from-amber-500/5 via-amber-500/5 to-transparent rounded-lg sm:rounded-xl border border-amber-500/10 backdrop-blur-sm">
+              <div className="flex items-start gap-2 sm:gap-3">
+                <div className="p-1.5 sm:p-2 bg-amber-500/10 rounded-md sm:rounded-lg flex-shrink-0 border border-amber-500/20">
+                  <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-slate-200 text-sm font-medium">Top-Up Offer</p>
+                  <p className="text-slate-200 text-xs sm:text-sm font-medium">Top-Up Offer</p>
                   <p className="text-slate-400 text-xs">
                     Pay ₦{topupPaymentAmount.toLocaleString()} → Get ₦{topupCreditAmount.toLocaleString()}
                   </p>
@@ -518,22 +524,22 @@ export default function Dashboard() {
           </Card>
         )}
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-3 gap-4">
+        {/* Stats Grid - CHANGE: reduced gap and padding for mobile */}
+        <div className="grid grid-cols-3 gap-2 sm:gap-4">
           {[
             { label: "Total Sent", value: totalSent, icon: TrendingUp, color: "rose" },
             { label: "Total Received", value: totalReceived, icon: TrendingDown, color: "emerald" },
             { label: "Transactions", value: transactions.length, icon: Activity, color: "slate", isCount: true },
           ].map((stat, index) => (
             <Card key={index} className="bg-slate-900/50 border-slate-800/50 backdrop-blur-sm shadow-lg">
-              <CardContent className="p-4 text-center">
+              <CardContent className="p-2.5 sm:p-4 text-center">
                 <div
-                  className={`w-11 h-11 mx-auto mb-3 rounded-xl bg-${stat.color}-500/10 border border-${stat.color}-500/20 flex items-center justify-center backdrop-blur-sm`}
+                  className={`w-9 h-9 sm:w-11 sm:h-11 mx-auto mb-2 sm:mb-3 rounded-lg sm:rounded-xl bg-${stat.color}-500/10 border border-${stat.color}-500/20 flex items-center justify-center backdrop-blur-sm flex-shrink-0`}
                 >
-                  <stat.icon className={`w-5 h-5 text-${stat.color}-400`} />
+                  <stat.icon className={`w-4 h-4 sm:w-5 sm:h-5 text-${stat.color}-400`} />
                 </div>
-                <p className="text-slate-400 text-xs mb-1.5 font-medium">{stat.label}</p>
-                <p className="text-white font-semibold text-base">
+                <p className="text-slate-400 text-xs mb-1 font-medium">{stat.label}</p>
+                <p className="text-white font-semibold text-sm sm:text-base">
                   {stat.isCount ? stat.value : formatCurrency(stat.value)}
                 </p>
               </CardContent>
