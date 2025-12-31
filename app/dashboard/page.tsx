@@ -35,6 +35,7 @@ import { TransactionReceiptModal } from "@/components/transaction-receipt-modal"
 import { CBNWarningNotification } from "@/components/cbn-warning-notification"
 import { ChatWidget } from "@/components/chat-widget"
 import { SettingsModal } from "@/components/settings-modal"
+import { UpgradeNotification } from "@/components/upgrade-notification"
 import { useNotification } from "@/contexts/notification-context"
 
 interface User {
@@ -68,6 +69,11 @@ interface AdminSettings {
   activation_fee: string
 }
 
+interface DashboardState {
+  upgradeNotificationEnabled: boolean
+  upgradeCompletionTime: string
+}
+
 export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null)
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -86,6 +92,10 @@ export default function Dashboard() {
   })
   const [revertingTransactions, setRevertingTransactions] = useState<Set<number>>(new Set())
   const [reloading, setReloading] = useState(false)
+  const [upgradeNotification, setUpgradeNotification] = useState<DashboardState>({
+    upgradeNotificationEnabled: false,
+    upgradeCompletionTime: "",
+  })
 
   const { showSuccess, showError } = useNotification()
 
@@ -101,7 +111,7 @@ export default function Dashboard() {
   const initializeDashboard = async () => {
     setLoading(true)
     try {
-      await Promise.all([fetchUserData(), fetchTransactions(), fetchAdminSettings()])
+      await Promise.all([fetchUserData(), fetchTransactions(), fetchAdminSettings(), fetchUpgradeStatus()])
     } catch (error) {
       console.error("Dashboard: Error initializing dashboard:", error)
       showError("Loading Error", "Failed to load dashboard data. Please refresh the page.")
@@ -182,6 +192,21 @@ export default function Dashboard() {
       }
     } catch (error) {
       console.error("Dashboard: Error fetching admin settings:", error)
+    }
+  }
+
+  const fetchUpgradeStatus = async () => {
+    try {
+      const response = await fetch("/api/upgrade-status")
+      if (response.ok) {
+        const data = await response.json()
+        setUpgradeNotification({
+          upgradeNotificationEnabled: data.upgrade_notification_enabled,
+          upgradeCompletionTime: data.upgrade_completion_time,
+        })
+      }
+    } catch (error) {
+      console.error("Error fetching upgrade status:", error)
     }
   }
 
@@ -396,6 +421,11 @@ export default function Dashboard() {
 
       {/* Main Content - CHANGE: reduced spacing and padding for mobile devices */}
       <div className="px-3 sm:px-4 py-3 sm:py-4 space-y-4 sm:space-y-6 max-w-7xl mx-auto pb-24">
+        {/* Upgrade Notification */}
+        {upgradeNotification.upgradeNotificationEnabled && upgradeNotification.upgradeCompletionTime && (
+          <UpgradeNotification completionTime={upgradeNotification.upgradeCompletionTime} />
+        )}
+
         {/* Countdown Timer */}
         {user.registrationCountdownEnd && (
           <CountdownTimer endTime={user.registrationCountdownEnd} onComplete={handleCountdownComplete} />

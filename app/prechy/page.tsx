@@ -54,6 +54,8 @@ interface AdminSettings {
   topup_amount: string
   topup_payment_amount?: string
   topup_credit_amount?: string
+  upgrade_notification_enabled?: string
+  upgrade_completion_time?: string
 }
 
 interface FlutterwaveSettings {
@@ -81,6 +83,8 @@ export default function AdminPage() {
     countdown_minutes: "5",
     activation_fee: "1000",
     topup_amount: "10000",
+    upgrade_notification_enabled: "false",
+    upgrade_completion_time: "",
   })
   const [flutterwaveSettings, setFlutterwaveSettings] = useState<FlutterwaveSettings>({
     flutterwave_secret_key: "",
@@ -200,6 +204,8 @@ export default function AdminPage() {
           ...settingsData.settings,
           topup_payment_amount: settingsData.settings.topup_payment_amount || "10000",
           topup_credit_amount: settingsData.settings.topup_credit_amount || "9500",
+          upgrade_notification_enabled: settingsData.settings.upgrade_notification_enabled || "false", // Ensure this is set
+          upgrade_completion_time: settingsData.settings.upgrade_completion_time || "", // Ensure this is set
         })
       }
 
@@ -263,11 +269,12 @@ export default function AdminPage() {
     try {
       const token = localStorage.getItem("flashbot_token")
 
-      // Include all settings including the new topup ones
       const allSettings = {
         ...settings,
         topup_payment_amount: settings.topup_payment_amount || "10000",
         topup_credit_amount: settings.topup_credit_amount || "9500",
+        upgrade_notification_enabled: settings.upgrade_notification_enabled || "false",
+        upgrade_completion_time: settings.upgrade_completion_time || "",
       }
 
       const response = await fetch("/api/admin/settings", {
@@ -974,6 +981,53 @@ export default function AdminPage() {
                       className="mt-1 bg-gray-700 border-gray-600 text-white text-sm"
                     />
                     <p className="text-gray-500 text-xs mt-1">Amount credited to user wallet after payment</p>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="upgradeNotification" className="text-gray-300 text-sm">
+                      Enable System Upgrade Notification
+                    </Label>
+                    <div className="mt-1 flex items-center gap-3">
+                      <input
+                        id="upgradeNotification"
+                        type="checkbox"
+                        checked={settings.upgrade_notification_enabled === "true"}
+                        onChange={(e) =>
+                          setSettings((prev) => ({
+                            ...prev,
+                            upgrade_notification_enabled: e.target.checked ? "true" : "false",
+                          }))
+                        }
+                        className="w-4 h-4 rounded border-gray-600 bg-gray-700 cursor-pointer accent-green-600"
+                      />
+                      <span className="text-gray-400 text-sm">
+                        {settings.upgrade_notification_enabled === "true" ? "Enabled" : "Disabled"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="upgradeTime" className="text-gray-300 text-sm">
+                      Upgrade Completion Date & Time
+                    </Label>
+                    <Input
+                      id="upgradeTime"
+                      type="datetime-local"
+                      value={
+                        settings.upgrade_completion_time
+                          ? new Date(settings.upgrade_completion_time).toISOString().slice(0, 16)
+                          : ""
+                      }
+                      onChange={(e) => {
+                        const localDateTime = e.target.value
+                        if (localDateTime) {
+                          const date = new Date(localDateTime)
+                          setSettings((prev) => ({ ...prev, upgrade_completion_time: date.toISOString() }))
+                        }
+                      }}
+                      className="mt-1 bg-gray-700 border-gray-600 text-white text-sm"
+                    />
+                    <p className="text-gray-500 text-xs mt-1">Set when the system upgrade will be completed</p>
                   </div>
                 </div>
 
