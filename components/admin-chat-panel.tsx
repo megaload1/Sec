@@ -3,12 +3,13 @@
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
-import { MessageCircle, Send, X, Users, Clock } from "lucide-react"
+import { MessageCircle, Send, X, Users, Clock, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Checkbox } from "@/components/ui/checkbox"
 
 interface Message {
   id: number
@@ -39,6 +40,8 @@ export function AdminChatPanel() {
   const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState("")
   const [loading, setLoading] = useState(false)
+  const [selectedConversationIds, setSelectedConversationIds] = useState<Set<number>>(new Set())
+  const [selectAll, setSelectAll] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -81,7 +84,7 @@ export function AdminChatPanel() {
 
   useEffect(() => {
     fetchConversations()
-    const interval = setInterval(fetchConversations, 10000) // Refresh conversations every 10 seconds
+    const interval = setInterval(fetchConversations, 10000)
     return () => clearInterval(interval)
   }, [])
 
@@ -151,7 +154,7 @@ export function AdminChatPanel() {
         setMessages((prev) => [...prev, data.message])
         setNewMessage("")
         setTimeout(() => scrollToBottom(), 0)
-        fetchConversations() // Refresh conversations list
+        fetchConversations()
       }
     } catch (error) {
       console.error("Error sending message:", error)
@@ -182,6 +185,54 @@ export function AdminChatPanel() {
       }
     } catch (error) {
       console.error("Error closing conversation:", error)
+    }
+  }
+
+  const bulkCloseConversations = async () => {
+    if (selectedConversationIds.size === 0) return
+
+    try {
+      const token = localStorage.getItem("flashbot_token")
+      if (!token) return
+
+      const response = await fetch("/api/admin/chat/bulk-close", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          conversationIds: Array.from(selectedConversationIds),
+        }),
+      })
+
+      if (response.ok) {
+        setSelectedConversationIds(new Set())
+        setSelectAll(false)
+        fetchConversations()
+      }
+    } catch (error) {
+      console.error("Error bulk closing conversations:", error)
+    }
+  }
+
+  const toggleConversationSelection = (conversationId: number) => {
+    const newSelected = new Set(selectedConversationIds)
+    if (newSelected.has(conversationId)) {
+      newSelected.delete(conversationId)
+    } else {
+      newSelected.add(conversationId)
+    }
+    setSelectedConversationIds(newSelected)
+  }
+
+  const toggleSelectAll = (conversationsToSelect: Conversation[]) => {
+    if (selectAll) {
+      setSelectedConversationIds(new Set())
+      setSelectAll(false)
+    } else {
+      setSelectedConversationIds(new Set(conversationsToSelect.map((c) => c.id)))
+      setSelectAll(true)
     }
   }
 
@@ -247,10 +298,23 @@ export function AdminChatPanel() {
   return (
     <Card className="bg-gray-800 border-gray-700 h-[600px] flex flex-col">
       <CardHeader>
-        <CardTitle className="text-white flex items-center gap-2">
-          <MessageCircle className="w-5 h-5 text-green-400" />
-          Live Chat Support
-          <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20">{openConversations.length} Active</Badge>
+        <CardTitle className="text-white flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <MessageCircle className="w-5 h-5 text-green-400" />
+            Live Chat Support
+            <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20">{openConversations.length} Active</Badge>
+          </div>
+          {selectedConversationIds.size > 0 && (
+            <Button
+              onClick={bulkCloseConversations}
+              size="sm"
+              variant="outline"
+              className="border-red-600 text-red-400 hover:bg-red-700 bg-transparent"
+            >
+              <Trash2 className="w-4 h-4 mr-1" />
+              Close {selectedConversationIds.size} Selected
+            </Button>
+          )}
         </CardTitle>
       </CardHeader>
 
@@ -268,32 +332,46 @@ export function AdminChatPanel() {
             </TabsList>
 
             <TabsContent value="open" className="flex-1 overflow-y-auto mt-2">
+              <div className="mb-3 flex items-center gap-2 px-3">
+                <Checkbox
+                  checked={selectAll && openConversations.length > 0}
+                  onCheckedChange={() => toggleSelectAll(openConversations)}
+                  className="border-gray-500"
+                />
+                <span className="text-sm text-gray-400">Select All</span>
+              </div>
               <div className="space-y-2">
                 {openConversations.map((conversation) => (
                   <div
                     key={conversation.id}
-                    onClick={() => selectConversation(conversation)}
-                    className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                    className={`p-3 rounded-lg transition-colors flex items-start gap-2 ${
                       selectedConversation?.id === conversation.id
                         ? "bg-blue-600/20 border border-blue-500/30"
                         : "bg-gray-700/50 hover:bg-gray-700"
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-white font-medium text-sm">
-                        {conversation.first_name} {conversation.last_name}
-                      </p>
-                      {conversation.unread_count > 0 && (
-                        <Badge className="bg-red-500 text-white text-xs px-1 py-0">{conversation.unread_count}</Badge>
-                      )}
-                    </div>
-                    <p className="text-gray-400 text-xs mb-1">{conversation.email}</p>
-                    <p className="text-gray-300 text-xs truncate">{conversation.last_message || "No messages yet"}</p>
-                    <div className="flex items-center justify-between mt-2">
-                      <p className="text-gray-500 text-xs">{formatDate(conversation.last_message_at)}</p>
-                      {!conversation.admin_responded && (
-                        <Badge className="bg-yellow-500/10 text-yellow-400 border-yellow-500/20 text-xs">New</Badge>
-                      )}
+                    <Checkbox
+                      checked={selectedConversationIds.has(conversation.id)}
+                      onCheckedChange={() => toggleConversationSelection(conversation.id)}
+                      className="mt-1 border-gray-500"
+                    />
+                    <div onClick={() => selectConversation(conversation)} className="flex-1 cursor-pointer">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-white font-medium text-sm">
+                          {conversation.first_name} {conversation.last_name}
+                        </p>
+                        {conversation.unread_count > 0 && (
+                          <Badge className="bg-red-500 text-white text-xs px-1 py-0">{conversation.unread_count}</Badge>
+                        )}
+                      </div>
+                      <p className="text-gray-400 text-xs mb-1">{conversation.email}</p>
+                      <p className="text-gray-300 text-xs truncate">{conversation.last_message || "No messages yet"}</p>
+                      <div className="flex items-center justify-between mt-2">
+                        <p className="text-gray-500 text-xs">{formatDate(conversation.last_message_at)}</p>
+                        {!conversation.admin_responded && (
+                          <Badge className="bg-yellow-500/10 text-yellow-400 border-yellow-500/20 text-xs">New</Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
