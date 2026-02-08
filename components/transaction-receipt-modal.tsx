@@ -12,6 +12,7 @@ import {
   ArrowUpRight,
   ArrowDownLeft,
   AlertTriangle,
+  Copy,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { formatCurrency } from "@/lib/utils"
@@ -46,57 +47,34 @@ export function TransactionReceiptModal({ isOpen, onClose, transaction, userInfo
 
   if (!transaction) return null
 
-  const getStatusIcon = () => {
-    switch (transaction.status) {
-      case "completed":
-        return <CheckCircle className="w-4 h-4 text-green-400" />
-      case "pending":
-        return <Clock className="w-4 h-4 text-yellow-400" />
-      case "failed":
-        return <XCircle className="w-4 h-4 text-red-400" />
-      default:
-        return <Clock className="w-4 h-4 text-gray-400" />
-    }
-  }
-
   const getStatusColor = () => {
     switch (transaction.status) {
       case "completed":
-        return "text-green-400 bg-green-500/10 border-green-500/20"
+        return "#00D094"
       case "pending":
-        return "text-yellow-400 bg-yellow-500/10 border-yellow-500/20"
+        return "#FFA500"
       case "failed":
-        return "text-red-400 bg-red-500/10 border-red-500/20"
+        return "#FF6B6B"
       default:
-        return "text-gray-400 bg-gray-500/10 border-gray-500/20"
+        return "#999999"
     }
   }
 
-  const getTransactionIcon = () => {
-    if (transaction.type === "credit") {
-      return <ArrowDownLeft className="w-5 h-5 text-green-400" />
+  const getStatusLabel = () => {
+    switch (transaction.status) {
+      case "completed":
+        return "Successful"
+      case "pending":
+        return "Pending"
+      case "failed":
+        return "Failed"
+      default:
+        return transaction.status
     }
-    return <ArrowUpRight className="w-5 h-5 text-red-400" />
-  }
-
-  const getPendingReason = () => {
-    if (transaction.status === "pending") {
-      if (transaction.type === "transfer") {
-        return "Account not activated. Activate your account to complete transfers."
-      }
-      if (transaction.type === "activation") {
-        return "Waiting for payment confirmation from Flutterwave."
-      }
-      if (transaction.type === "topup") {
-        return "Waiting for payment confirmation from Flutterwave."
-      }
-    }
-    return null
   }
 
   const handleDownload = async () => {
     setDownloading(true)
-    // Simulate download
     setTimeout(() => {
       setDownloading(false)
     }, 2000)
@@ -106,7 +84,7 @@ export function TransactionReceiptModal({ isOpen, onClose, transaction, userInfo
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "FLASHBOT Transaction Receipt",
+          title: "BST array Transaction Receipt",
           text: `Transaction Receipt - ${formatCurrency(transaction.amount)}`,
           url: window.location.href,
         })
@@ -116,7 +94,13 @@ export function TransactionReceiptModal({ isOpen, onClose, transaction, userInfo
     }
   }
 
-  const isTransferTransaction = transaction.type === "transfer" && transaction.recipient_account_name
+  const formattedDate = new Date(transaction.created_at).toLocaleString("en-NG", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  })
 
   return (
     <AnimatePresence>
@@ -133,191 +117,138 @@ export function TransactionReceiptModal({ isOpen, onClose, transaction, userInfo
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-6"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
           >
-            {/* Smaller container - max height 85vh to fit mobile screens better */}
-            <div className="w-full max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden relative max-h-[85vh] flex flex-col">
-              {/* Close Button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onClose}
-                className="absolute top-2 right-2 z-10 text-gray-600 hover:text-gray-800 hover:bg-gray-100 p-1.5 rounded-full h-8 w-8"
-              >
-                <X className="w-4 h-4" />
-              </Button>
-
-              {/* Header - Fixed */}
-              <div className="bg-gradient-to-r from-green-600 to-green-700 p-4 text-white flex-shrink-0">
-                <div className="text-center">
-                  <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                    {getTransactionIcon()}
-                  </div>
-                  <h2 className="text-base font-bold mb-1">FLASHBOT</h2>
-                  <p className="text-green-100 text-xs">Transaction Receipt</p>
+            <div className="w-full max-w-md bg-[#121212] rounded-2xl shadow-2xl overflow-hidden relative max-h-[90vh] flex flex-col">
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+                <button onClick={onClose} className="text-white/60 hover:text-white">
+                  <X className="w-5 h-5" />
+                </button>
+                <h1 className="text-sm font-medium text-white/80">Transaction Details</h1>
+                <div className="w-6 h-6 bg-[#7E3AF2] rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-4 h-4 text-white" />
                 </div>
               </div>
 
               {/* Scrollable Content */}
               <div className="flex-1 overflow-y-auto">
-                <div className="p-4 bg-white">
-                  {/* Status */}
-                  <div className="text-center mb-3">
-                    <div className="flex items-center justify-center mb-1">{getStatusIcon()}</div>
-                    <div
-                      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor()}`}
-                    >
-                      {transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}
-                    </div>
-                  </div>
-
-                  {/* Amount */}
-                  <div className="text-center mb-3">
-                    <p className="text-gray-600 text-xs mb-1">Amount</p>
-                    <p className="text-xl font-bold text-gray-900">
-                      {transaction.type === "credit" ? "+" : "-"}
-                      {formatCurrency(transaction.amount)}
+                <div className="p-4">
+                  {/* Main Card */}
+                  <div className="bg-[#1E1E1E] rounded-xl pt-6 pb-4 px-4 flex flex-col items-center mb-4">
+                    <p className="text-[#D1D1D1] text-xs font-medium mb-3 uppercase tracking-wide">
+                      {transaction.type === "transfer" 
+                        ? `Transfer to ${transaction.recipient_account_name || "Recipient"}` 
+                        : transaction.type === "topup" 
+                        ? "Wallet Top-up" 
+                        : "Transaction"}
                     </p>
-                  </div>
-
-                  {/* Transaction Details */}
-                  <div className="space-y-2 mb-3">
-                    <div className="flex justify-between py-1 border-b border-gray-100">
-                      <span className="text-gray-600 text-xs">Transaction ID</span>
-                      <span className="text-gray-900 text-xs font-medium">#{transaction.id}</span>
+                    <div className="flex items-center mb-1">
+                      <span className="text-lg font-bold mr-0.5">₦</span>
+                      <span className="text-2xl font-bold">{(transaction.amount / 1).toLocaleString("en-NG")}</span>
                     </div>
+                    <span className="text-xs font-semibold mb-6" style={{ color: getStatusColor() }}>
+                      {getStatusLabel()}
+                    </span>
 
-                    <div className="flex justify-between py-1 border-b border-gray-100">
-                      <span className="text-gray-600 text-xs">Reference</span>
-                      <span className="text-gray-900 text-xs font-mono text-right max-w-[120px] truncate">
-                        {transaction.reference || "N/A"}
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between py-1 border-b border-gray-100">
-                      <span className="text-gray-600 text-xs">Type</span>
-                      <span className="text-gray-900 text-xs font-medium capitalize">{transaction.type}</span>
-                    </div>
-
-                    <div className="flex justify-between py-1 border-b border-gray-100">
-                      <span className="text-gray-600 text-xs">Date & Time</span>
-                      <span className="text-gray-900 text-xs text-right">
-                        {new Date(transaction.created_at).toLocaleString("en-NG", {
-                          month: "short",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </span>
-                    </div>
-
-                    {transaction.recipient_account_name && (
-                      <>
-                        <div className="flex justify-between py-1 border-b border-gray-100">
-                          <span className="text-gray-600 text-xs">Recipient</span>
-                          <span className="text-gray-900 text-xs font-medium text-right max-w-[140px] truncate">
-                            {transaction.recipient_account_name}
-                          </span>
+                    {/* Timeline */}
+                    <div className="flex w-full mb-6 px-2">
+                      <div className="flex-1 flex flex-col items-center">
+                        <div className="flex items-center w-full mb-2">
+                          <div className="flex-grow border-t border-white/20"></div>
+                          <div className="w-3 h-3 rounded-full bg-[#00D094] flex items-center justify-center mx-1 flex-shrink-0">
+                            <CheckCircle className="w-2 h-2 text-[#121212]" />
+                          </div>
+                          <div className="flex-grow border-t border-white/20"></div>
                         </div>
-
-                        <div className="flex justify-between py-1 border-b border-gray-100">
-                          <span className="text-gray-600 text-xs">Account</span>
-                          <span className="text-gray-900 text-xs font-mono">
-                            {transaction.recipient_account_number}
-                          </span>
-                        </div>
-
-                        <div className="flex justify-between py-1 border-b border-gray-100">
-                          <span className="text-gray-600 text-xs">Bank</span>
-                          <span className="text-gray-900 text-xs text-right max-w-[120px] truncate">
-                            {transaction.recipient_bank_name}
-                          </span>
-                        </div>
-                      </>
-                    )}
-
-                    {userInfo && (
-                      <div className="flex justify-between py-1 border-b border-gray-100">
-                        <span className="text-gray-600 text-xs">From</span>
-                        <span className="text-gray-900 text-xs text-right">
-                          {userInfo.firstName} {userInfo.lastName}
-                        </span>
+                        <span className="text-xs text-[#999999] text-center">Payment successful</span>
+                        <span className="text-[10px] text-[#666666] mt-1">{formattedDate}</span>
                       </div>
-                    )}
-
-                    <div className="flex justify-between py-1">
-                      <span className="text-gray-600 text-xs">Description</span>
-                      <span className="text-gray-900 text-xs text-right max-w-[140px] break-words">
-                        {transaction.description || "No description"}
-                      </span>
                     </div>
-                  </div>
 
-                  {/* Pending Reason */}
-                  {getPendingReason() && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-2 mb-3">
-                      <p className="text-yellow-800 text-xs leading-relaxed">
-                        <strong>Pending:</strong> {getPendingReason()}
+                    {/* Notice */}
+                    <div className="bg-[#181818] border border-white/10 rounded-lg p-3 w-full text-xs leading-relaxed mb-4">
+                      <p className="text-[#888888]">
+                        The recipient account is expected to be credited within 5 minutes, subject to notification by the bank. If you have any questions, contact support.
                       </p>
                     </div>
-                  )}
 
-                  {/* CBN Warning Notice - Show for transfer transactions */}
-                  {isTransferTransaction && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-2 mb-3">
-                      <div className="flex items-start gap-2">
-                        <AlertTriangle className="w-3 h-3 text-red-600 flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-red-800 text-xs leading-relaxed font-semibold mb-1">CBN WARNING NOTICE</p>
-                          <p className="text-red-700 text-xs leading-relaxed">
-                            This transfer was generated by FLASHBOT AI and is <strong>NOT VERIFIED</strong> by the
-                            Central Bank of Nigeria (CBN). Funds may be automatically debited from recipient's account
-                            within 48 hours.
-                          </p>
-                        </div>
+                    {/* Amount Breakdown */}
+                    <div className="w-full space-y-2">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-[#999999]">Amount</span>
+                        <span className="font-medium text-white">₦{(transaction.amount / 1).toLocaleString("en-NG")}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-[#999999]">Fee</span>
+                        <span className="font-medium text-white">₦0.00</span>
+                      </div>
+                      <div className="flex justify-between items-center text-xs border-t border-white/10 pt-2 mt-2">
+                        <span className="text-[#999999]">Amount Paid</span>
+                        <span className="font-medium text-white">₦{(transaction.amount / 1).toLocaleString("en-NG")}</span>
                       </div>
                     </div>
-                  )}
+                  </div>
 
-                  {/* General Warning Notice */}
-                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 mb-3">
-                    <p className="text-orange-800 text-xs leading-relaxed">
-                      <strong>Notice:</strong> FLASHBOT is not responsible for any financial losses. Use at your own
-                      risk.
-                    </p>
+                  {/* Transaction Details Section */}
+                  <div className="bg-[#1E1E1E] rounded-xl p-4">
+                    <h2 className="text-white font-semibold text-sm mb-4">Transaction Details</h2>
+                    <div className="space-y-3">
+                      {transaction.recipient_account_name && (
+                        <div className="flex justify-between items-start text-xs">
+                          <span className="text-[#999999]">Recipient Details</span>
+                          <div className="text-right">
+                            <p className="font-medium leading-tight text-white">{transaction.recipient_account_name}</p>
+                            <p className="text-[#888888] text-[10px]">
+                              {transaction.recipient_bank_name} | {transaction.recipient_account_number}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-[#999999]">Transaction No.</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-white text-right">{transaction.reference || `TXN-${transaction.id}`}</span>
+                          <Copy className="w-3 h-3 text-[#888888] cursor-pointer hover:text-white" />
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-[#999999]">Payment Method</span>
+                        <div className="flex items-center gap-1 font-medium text-white">
+                          <span>Wallet</span>
+                          <ArrowUpRight className="w-3 h-3 text-[#888888]" />
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-[#999999]">Date & Time</span>
+                        <span className="font-medium text-white">{formattedDate}</span>
+                      </div>
+                      {transaction.description && (
+                        <div className="flex justify-between items-start text-xs">
+                          <span className="text-[#999999]">Description</span>
+                          <span className="font-medium text-white text-right max-w-[150px]">{transaction.description}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Fixed Footer */}
-              <div className="bg-white border-t border-gray-100 p-4 flex-shrink-0">
-                {/* Action Buttons */}
-                <div className="flex gap-2 mb-3">
-                  <Button
-                    onClick={handleDownload}
-                    disabled={downloading}
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 bg-transparent text-xs h-8"
-                  >
-                    <Download className="w-3 h-3 mr-1" />
-                    {downloading ? "..." : "Download"}
-                  </Button>
-                  <Button
-                    onClick={handleShare}
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 bg-transparent text-xs h-8"
-                  >
-                    <Share className="w-3 h-3 mr-1" />
-                    Share
-                  </Button>
-                </div>
-
-                {/* Footer */}
-                <div className="text-center">
-                  <p className="text-gray-500 text-xs">FLASHBOT • {new Date().toLocaleDateString("en-NG")}</p>
-                </div>
+              {/* Footer Buttons */}
+              <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-4 bg-[#121212]/95 border-t border-white/10 flex gap-3">
+                <button
+                  onClick={handleDownload}
+                  disabled={downloading}
+                  className="flex-1 py-2.5 rounded-full bg-[#2a2a2a] text-white/70 hover:text-white font-bold text-sm transition-colors"
+                >
+                  {downloading ? "..." : "Report Issue"}
+                </button>
+                <button
+                  onClick={handleShare}
+                  className="flex-1 py-2.5 rounded-full bg-[#00D094] text-[#121212] font-bold text-sm shadow-lg hover:bg-[#00E5A8] transition-colors"
+                >
+                  Share Receipt
+                </button>
               </div>
             </div>
           </motion.div>
