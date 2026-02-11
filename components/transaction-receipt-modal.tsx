@@ -151,25 +151,48 @@ export function TransactionReceiptModal({ isOpen, onClose, transaction, userInfo
                       {getStatusLabel()}
                     </span>
 
-                    {/* Timeline */}
+                    {/* Timeline - Status Based */}
                     <div className="flex w-full mb-6 px-2">
                       <div className="flex-1 flex flex-col items-center">
                         <div className="flex items-center w-full mb-2">
                           <div className="flex-grow border-t border-white/20"></div>
-                          <div className="w-3 h-3 rounded-full bg-[#00D094] flex items-center justify-center mx-1 flex-shrink-0">
-                            <CheckCircle className="w-2 h-2 text-[#121212]" />
+                          <div 
+                            className="w-3 h-3 rounded-full flex items-center justify-center mx-1 flex-shrink-0"
+                            style={{ backgroundColor: getStatusColor() }}
+                          >
+                            {transaction.status === "completed" && (
+                              <CheckCircle className="w-2 h-2 text-[#121212]" />
+                            )}
+                            {transaction.status === "pending" && (
+                              <Clock className="w-2 h-2 text-[#121212]" />
+                            )}
+                            {transaction.status === "failed" && (
+                              <XCircle className="w-2 h-2 text-[#121212]" />
+                            )}
                           </div>
                           <div className="flex-grow border-t border-white/20"></div>
                         </div>
-                        <span className="text-xs text-[#999999] text-center">Payment successful</span>
+                        <span className="text-xs text-[#999999] text-center">
+                          {transaction.status === "completed" && "Payment successful"}
+                          {transaction.status === "pending" && "Payment pending"}
+                          {transaction.status === "failed" && "Payment failed"}
+                        </span>
                         <span className="text-[10px] text-[#666666] mt-1">{formattedDate}</span>
                       </div>
                     </div>
 
-                    {/* Notice */}
+                    {/* Notice - Status Based */}
                     <div className="bg-[#181818] border border-white/10 rounded-lg p-3 w-full text-xs leading-relaxed mb-4">
                       <p className="text-[#888888]">
-                        The recipient account is expected to be credited within 5 minutes, subject to notification by the bank. If you have any questions, contact support.
+                        {transaction.status === "completed" && (
+                          <>The recipient account is expected to be credited within 5 minutes, subject to notification by the bank. If you have any questions, contact support.</>
+                        )}
+                        {transaction.status === "pending" && (
+                          <>This transaction is still pending. Please wait for confirmation from the bank. This may take a few minutes. Do not attempt to send the same amount again.</>
+                        )}
+                        {transaction.status === "failed" && (
+                          <>This transaction failed. Your account has not been debited. Please try again or contact support if the issue persists.</>
+                        )}
                       </p>
                     </div>
 
