@@ -115,7 +115,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                 {mode === "login"
                   ? "Sign in to your account"
                   : mode === "register"
-                    ? "Join NEXUS PAY today"
+                    ? "Join FLASHBOT today"
                     : "Enter your email"}
               </p>
             </div>
