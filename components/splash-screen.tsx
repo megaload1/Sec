@@ -13,10 +13,10 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
   const [currentStep, setCurrentStep] = useState(0)
 
   const steps = [
-    { text: "Initializing FLASHBOT AI...", icon: Zap },
+    { text: "Initializing...", icon: Zap },
     { text: "Securing connection...", icon: Lock },
-    { text: "Syncing with servers...", icon: Wifi },
-    { text: "Loading dashboard...", icon: Shield },
+    { text: "Loading your wallet...", icon: Wifi },
+    { text: "Ready to transact...", icon: Shield },
   ]
 
   useEffect(() => {
@@ -48,18 +48,16 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-gray-950"
+        className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden"
+        style={{ backgroundColor: "hsl(0, 0%, 5%)" }}
       >
-        {/* Subtle Background Pattern */}
-        <div className="absolute inset-0 opacity-5">
+        {/* Gradient Background */}
+        <div className="absolute inset-0 opacity-40">
           <div
             className="absolute inset-0"
             style={{
-              backgroundImage: `
-                linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
-              `,
-              backgroundSize: "50px 50px",
+              background: `radial-gradient(circle at 20% 50%, hsl(200, 100%, 40%) 0%, transparent 50%),
+                           radial-gradient(circle at 80% 80%, hsl(160, 70%, 40%) 0%, transparent 50%)`,
             }}
           />
         </div>
@@ -79,39 +77,29 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
             className="relative mb-12"
           >
             {/* Glow Effect */}
-            <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-3xl" />
-
-            {/* Main Logo Circle */}
             <motion.div
               animate={{
-                boxShadow: [
-                  "0 0 40px rgba(59, 130, 246, 0.3)",
-                  "0 0 60px rgba(59, 130, 246, 0.4)",
-                  "0 0 40px rgba(59, 130, 246, 0.3)",
-                ],
+                opacity: [0.4, 0.7, 0.4],
               }}
               transition={{
-                duration: 2,
+                duration: 3,
                 repeat: Number.POSITIVE_INFINITY,
                 ease: "easeInOut",
               }}
-              className="relative w-32 h-32 bg-gradient-to-br from-blue-600 to-blue-500 rounded-full flex items-center justify-center"
+              className="absolute inset-0 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 rounded-full blur-3xl"
+            />
+
+            {/* Main Logo Circle */}
+            <motion.div
+              className="relative w-32 h-32 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-full flex items-center justify-center shadow-2xl"
+              whileHover={{ scale: 1.05 }}
             >
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
               >
-                <Zap className="w-16 h-16 text-white" strokeWidth={2.5} />
+                <Zap className="w-16 h-16 text-white" strokeWidth={2} />
               </motion.div>
-            </motion.div>
-
-            {/* Spinning Ring */}
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-              className="absolute inset-0 w-32 h-32"
-            >
-              <div className="absolute top-0 left-1/2 w-3 h-3 -ml-1.5 bg-blue-500 rounded-full" />
             </motion.div>
           </motion.div>
 
@@ -122,8 +110,10 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
             transition={{ delay: 0.5, duration: 0.8 }}
             className="mb-8"
           >
-            <h1 className="text-5xl font-bold mb-3 text-white tracking-wide">FLASHBOT</h1>
-            <p className="text-gray-400 text-lg">Instant Money Transfer</p>
+            <h1 className="text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-400">
+              NEXUS PAY
+            </h1>
+            <p className="text-gray-300 text-base font-light">Modern Money, Instant Transfers</p>
           </motion.div>
 
           {/* Progress Section */}
@@ -135,16 +125,16 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
           >
             {/* Progress Bar */}
             <div className="relative mb-6">
-              <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+              <div className="h-1 bg-gray-800/50 rounded-full overflow-hidden backdrop-blur">
                 <motion.div
-                  className="h-full bg-blue-500 rounded-full"
+                  className="h-full bg-gradient-to-r from-blue-400 to-cyan-400"
                   initial={{ width: 0 }}
                   animate={{ width: `${progress}%` }}
                   transition={{ duration: 0.3 }}
                 />
               </div>
               <div className="flex justify-between mt-2">
-                <span className="text-xs text-gray-600">Loading...</span>
+                <span className="text-xs text-gray-500">Setting up your wallet</span>
                 <span className="text-xs text-blue-400 font-semibold">{Math.round(progress)}%</span>
               </div>
             </div>
@@ -157,7 +147,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.3 }}
-                className="flex items-center justify-center gap-3 p-4 bg-gray-900 rounded-xl border border-gray-800"
+                className="flex items-center justify-center gap-3 px-4 py-3 bg-white/5 backdrop-blur-md rounded-xl border border-white/10"
               >
                 <motion.div
                   animate={{ rotate: 360 }}
@@ -165,10 +155,10 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
                 >
                   {(() => {
                     const StepIcon = steps[currentStep].icon
-                    return <StepIcon className="w-5 h-5 text-blue-400" />
+                    return <StepIcon className="w-5 h-5 text-cyan-400" />
                   })()}
                 </motion.div>
-                <p className="text-gray-300 text-sm font-medium">{steps[currentStep].text}</p>
+                <p className="text-gray-200 text-sm font-medium">{steps[currentStep].text}</p>
               </motion.div>
             </AnimatePresence>
           </motion.div>

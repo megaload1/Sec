@@ -302,13 +302,13 @@ export default function Dashboard() {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      completed: { label: "Completed", className: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
-      pending: { label: "Pending", className: "bg-amber-500/10 text-amber-400 border-amber-500/20" },
-      failed: { label: "Failed", className: "bg-rose-500/10 text-rose-400 border-rose-500/20" },
-      reverted: { label: "Reverted", className: "bg-slate-500/10 text-slate-400 border-slate-500/20" },
+      completed: { label: "Completed", className: "bg-green-500/20 text-green-400 border-green-500/30" },
+      pending: { label: "Pending", className: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" },
+      failed: { label: "Failed", className: "bg-red-500/20 text-red-400 border-red-500/30" },
+      reverted: { label: "Reverted", className: "bg-gray-500/20 text-gray-400 border-gray-500/30" },
     }
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending
-    return <Badge className={`${config.className} text-xs px-2 py-1`}>{config.label}</Badge>
+    return <Badge className={`${config.className} text-xs px-2 py-1 border`}>{config.label}</Badge>
   }
 
   const getPendingReason = (transaction: Transaction) => {
@@ -329,14 +329,14 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "hsl(0, 0%, 5%)" }}>
         <div className="text-center">
           <motion.div
             animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-            className="w-12 h-12 border-4 border-slate-700 border-t-slate-400 rounded-full mx-auto mb-4"
+            transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+            className="w-16 h-16 border-4 border-white/10 border-t-cyan-400 rounded-full mx-auto mb-4"
           />
-          <p className="text-slate-400">Loading your dashboard...</p>
+          <p className="text-gray-400">Setting up your dashboard...</p>
         </div>
       </div>
     )
@@ -344,10 +344,10 @@ export default function Dashboard() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: "hsl(0, 0%, 5%)" }}>
         <div className="text-center">
-          <p className="text-rose-400 mb-4">Error loading user data</p>
-          <Button onClick={() => (window.location.href = "/")} className="bg-slate-700 hover:bg-slate-600 text-white">
+          <p className="text-red-400 mb-4">Error loading user data</p>
+          <Button onClick={() => (window.location.href = "/")} className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:opacity-90">
             Back to Home
           </Button>
         </div>
@@ -368,41 +368,41 @@ export default function Dashboard() {
     .reduce((sum, t) => sum + safeNumber(t.amount), 0)
 
   return (
-    <div className="min-h-screen bg-slate-950 overflow-x-hidden">
+    <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: "hsl(0, 0%, 5%)" }}>
       <CBNWarningNotification />
 
-      {/* Header - CHANGE: reduced height and padding for mobile compactness */}
-      <div className="sticky top-0 z-30 bg-slate-900/80 backdrop-blur-xl border-b border-slate-800/50 h-14 sm:h-16">
-        <div className="flex items-center justify-between px-3 sm:px-4 h-full max-w-7xl mx-auto">
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+      {/* Modern Header */}
+      <div className="sticky top-0 z-30 backdrop-blur-xl border-b h-16 sm:h-20" style={{ backgroundColor: "hsla(0, 0%, 10%, 0.8)", borderColor: "hsla(0, 0%, 100%, 0.1)" }}>
+        <div className="flex items-center justify-between px-4 sm:px-6 h-full max-w-7xl mx-auto">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
             <div className="min-w-0 flex-1">
-              <h1 className="text-sm sm:text-base font-semibold text-white truncate">Welcome, {user.firstName}</h1>
+              <h1 className="text-lg sm:text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-400">Welcome, {user.firstName}</h1>
               <Badge
-                className={`text-xs mt-0.5 inline-block ${
+                className={`text-xs mt-1 inline-block ${
                   user.isActive
-                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                    : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                    ? "bg-green-500/20 text-green-400 border-green-500/30"
+                    : "bg-amber-500/20 text-amber-400 border-amber-500/30"
                 }`}
               >
-                {user.isActive ? "● Active" : "● Inactive"}
+                {user.isActive ? "✓ Active" : "◯ Inactive"}
               </Badge>
             </div>
           </div>
-          <div className="flex items-center gap-1 sm:gap-2">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Button
               variant="ghost"
               size="sm"
-              className="text-slate-400 hover:text-white hover:bg-slate-800/50 p-1.5 sm:p-2 relative h-8 w-8 sm:h-9 sm:w-9"
+              className="text-gray-400 hover:text-cyan-400 hover:bg-cyan-500/10 p-2 relative h-9 w-9 rounded-lg transition-all duration-200"
             >
-              <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
+              <Bell className="w-5 h-5" />
             </Button>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowSettingsModal(true)}
-              className="text-slate-400 hover:text-white hover:bg-slate-800/50 p-1.5 sm:p-2 h-8 w-8 sm:h-9 sm:w-9"
+              className="text-gray-400 hover:text-cyan-400 hover:bg-cyan-500/10 p-2 h-9 w-9 rounded-lg transition-all duration-200"
             >
-              <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
+              <Settings className="w-5 h-5" />
             </Button>
             <Button
               onClick={() => {
@@ -411,16 +411,16 @@ export default function Dashboard() {
               }}
               variant="ghost"
               size="sm"
-              className="text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 p-1.5 sm:p-2 h-8 w-8 sm:h-9 sm:w-9"
+              className="text-gray-400 hover:text-red-400 hover:bg-red-500/10 p-2 h-9 w-9 rounded-lg transition-all duration-200"
             >
-              <Power className="w-4 h-4 sm:w-5 sm:h-5" />
+              <Power className="w-5 h-5" />
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Main Content - CHANGE: reduced spacing and padding for mobile devices */}
-      <div className="px-3 sm:px-4 py-3 sm:py-4 space-y-4 sm:space-y-6 max-w-7xl mx-auto pb-24">
+      {/* Main Content */}
+      <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-6 max-w-7xl mx-auto pb-24">
         {/* Upgrade Notification */}
         {upgradeNotification.upgradeNotificationEnabled && upgradeNotification.upgradeCompletionTime && (
           <UpgradeNotification completionTime={upgradeNotification.upgradeCompletionTime} />
@@ -431,8 +431,9 @@ export default function Dashboard() {
           <CountdownTimer endTime={user.registrationCountdownEnd} onComplete={handleCountdownComplete} />
         )}
 
-        {/* Premium Wallet Card - CHANGE: reduced padding and font sizes */}
-        <Card className="bg-gradient-to-br from-slate-800/90 via-slate-800/80 to-slate-900/90 border-slate-700/50 shadow-xl backdrop-blur-sm overflow-hidden relative">
+        {/* Modern Wallet Card */}
+        <Card className="bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 border-0 shadow-2xl backdrop-blur-sm overflow-hidden relative">
+          {/* Card Pattern Background */}
           <div className="absolute inset-0 opacity-[0.02]">
             <div
               className="absolute inset-0"
@@ -443,74 +444,72 @@ export default function Dashboard() {
             />
           </div>
 
-          <CardContent className="p-4 sm:p-6 relative z-10">
-            <div className="flex items-center justify-between mb-4 sm:mb-6 flex-col sm:flex-row gap-3 sm:gap-0">
-              <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-                <div className="p-2 sm:p-2.5 bg-slate-700/50 rounded-lg sm:rounded-xl backdrop-blur-sm border border-slate-600/30 flex-shrink-0">
-                  <Wallet className="w-4 h-4 sm:w-5 sm:h-5 text-slate-300" />
+          <CardContent className="p-6 relative z-10">
+            <div className="flex items-center justify-between mb-6 flex-col sm:flex-row gap-3 sm:gap-0">
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                <div className="p-3 bg-white/20 rounded-lg backdrop-blur-sm flex-shrink-0">
+                  <Wallet className="w-5 h-5 text-white" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-slate-300 text-xs sm:text-sm font-medium">Available Balance</p>
-                  <p className="text-slate-500 text-xs">Ready to transfer</p>
+                  <p className="text-white/80 text-sm font-medium">Available Balance</p>
+                  <p className="text-white/60 text-xs">Ready to transfer</p>
                 </div>
               </div>
-              <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-end">
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
                 <Button
                   onClick={handleReloadDashboard}
                   disabled={reloading}
                   size="sm"
-                  className="bg-slate-700/50 hover:bg-slate-600/50 text-slate-200 border-0 h-8 sm:h-9 px-2 sm:px-3 backdrop-blur-sm text-xs"
+                  className="bg-white/20 hover:bg-white/30 text-white border-0 h-10 px-3 backdrop-blur-sm text-sm font-medium transition-all"
                 >
-                  <RefreshCw className={`w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 ${reloading ? "animate-spin" : ""}`} />
-                  <span className="hidden sm:inline">{reloading ? "Updating..." : "Refresh"}</span>
+                  <RefreshCw className={`w-4 h-4 mr-2 ${reloading ? "animate-spin" : ""}`} />
+                  {reloading ? "Updating..." : "Refresh"}
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowBalance(!showBalance)}
-                  className="text-slate-400 hover:text-white hover:bg-slate-700/50 p-1.5 sm:p-2 h-8 w-8 sm:h-9 sm:w-9"
+                  className="text-white hover:bg-white/20 p-2 h-10 w-10 rounded-lg transition-all"
                 >
                   {showBalance ? (
-                    <EyeOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    <EyeOff className="w-5 h-5" />
                   ) : (
-                    <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    <Eye className="w-5 h-5" />
                   )}
                 </Button>
               </div>
             </div>
 
-            <div className="text-2xl sm:text-4xl font-bold text-white mb-4 sm:mb-8 tracking-tight">
+            <div className="text-4xl font-bold text-white mb-8 tracking-tight">
               {showBalance ? formatCurrency(safeNumber(user.walletBalance)) : "••••••••"}
             </div>
 
-            <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4">
+            <div className="grid grid-cols-2 gap-3 mb-4">
               <Button
                 onClick={() => setShowSendModal(true)}
                 disabled={!user.isActive && user.walletBalance === 0}
-                className="w-full bg-slate-700 hover:bg-slate-600 text-white h-10 sm:h-12 font-medium text-sm sm:text-base"
+                className="w-full bg-white text-blue-600 hover:bg-gray-100 h-12 font-semibold rounded-lg transition-all"
               >
-                <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-                <span className="hidden sm:inline">Send Money</span>
-                <span className="sm:hidden">Send</span>
+                <Send className="w-4 h-4 mr-2" />
+                Send Money
               </Button>
               <Button
                 onClick={handleTopUpWallet}
-                className="w-full bg-slate-700/50 hover:bg-slate-600/50 text-slate-200 border border-slate-600/30 h-10 sm:h-12 font-medium text-sm sm:text-base backdrop-blur-sm"
+                className="w-full bg-white/20 hover:bg-white/30 text-white border border-white/30 h-12 font-semibold rounded-lg backdrop-blur-sm transition-all"
               >
-                <CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-                <span className="hidden sm:inline">Top Up</span>
-                <span className="sm:hidden">Top Up</span>
+                <CreditCard className="w-4 h-4 mr-2" />
+                Top Up
               </Button>
             </div>
 
-            <div className="p-3 sm:p-4 bg-gradient-to-r from-amber-500/5 via-amber-500/5 to-transparent rounded-lg sm:rounded-xl border border-amber-500/10 backdrop-blur-sm">
-              <div className="flex items-start gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-amber-500/10 rounded-md sm:rounded-lg flex-shrink-0 border border-amber-500/20">
-                  <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
+            <div className="p-4 bg-white/10 backdrop-blur-md rounded-lg border border-white/20">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-yellow-400/20 rounded-lg flex-shrink-0 border border-yellow-400/30">
+                  <Sparkles className="w-4 h-4 text-yellow-300" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-slate-200 text-xs sm:text-sm font-medium">Top-Up Offer</p>
-                  <p className="text-slate-400 text-xs">
+                  <p className="text-white text-sm font-semibold">Special Offer</p>
+                  <p className="text-white/70 text-xs mt-1">
                     Pay ₦{topupPaymentAmount.toLocaleString()} → Get ₦{topupCreditAmount.toLocaleString()}
                   </p>
                 </div>
@@ -519,34 +518,25 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Account Activation - Updated Design */}
+        {/* Account Activation Card */}
         {!user.isActive && (
-          <Card className="bg-gradient-to-br from-slate-800/40 via-slate-800/30 to-slate-900/40 border-slate-700/30 shadow-lg backdrop-blur-sm overflow-hidden relative">
-            <div className="absolute inset-0 opacity-[0.02]">
-              <div
-                className="absolute inset-0"
-                style={{
-                  backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
-                  backgroundSize: "24px 24px",
-                }}
-              />
-            </div>
+          <Card className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 shadow-lg backdrop-blur-sm overflow-hidden relative">
             <CardContent className="p-6 relative z-10">
               <div className="flex items-start gap-4">
-                <div className="p-3 bg-amber-500/10 rounded-xl flex-shrink-0 border border-amber-500/20">
-                  <AlertCircle className="w-6 h-6 text-amber-400" />
+                <div className="p-3 bg-amber-500/30 rounded-lg flex-shrink-0 border border-amber-500/40">
+                  <AlertCircle className="w-6 h-6 text-amber-300" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-white font-semibold mb-2">Account Activation Required</h3>
-                  <p className="text-slate-400 text-sm mb-4 leading-relaxed">
-                    Unlock unlimited transfers to all Nigerian banks and enjoy seamless transactions.
+                  <h3 className="text-white font-bold mb-2 text-lg">Activate Your Account</h3>
+                  <p className="text-gray-200 text-sm mb-4 leading-relaxed">
+                    Unlock unlimited transfers to all Nigerian banks and enjoy seamless transactions without limits.
                   </p>
                   <Button
                     onClick={handleActivateAccount}
-                    className="bg-slate-700/70 hover:bg-slate-600/70 text-slate-100 border border-slate-600/30 font-medium backdrop-blur-sm"
+                    className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold"
                   >
                     <Zap className="w-4 h-4 mr-2" />
-                    Activate Account (₦{activationFee.toLocaleString()})
+                    Activate Now (₦{activationFee.toLocaleString()})
                   </Button>
                 </div>
               </div>
@@ -554,22 +544,20 @@ export default function Dashboard() {
           </Card>
         )}
 
-        {/* Stats Grid - CHANGE: reduced gap and padding for mobile */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-4">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-3 gap-3">
           {[
-            { label: "Total Sent", value: totalSent, icon: TrendingUp, color: "rose" },
-            { label: "Total Received", value: totalReceived, icon: TrendingDown, color: "emerald" },
-            { label: "Transactions", value: transactions.length, icon: Activity, color: "slate", isCount: true },
+            { label: "Total Sent", value: totalSent, icon: TrendingUp, color: "bg-red-500/20 text-red-400 border-red-500/30" },
+            { label: "Total Received", value: totalReceived, icon: TrendingDown, color: "bg-green-500/20 text-green-400 border-green-500/30" },
+            { label: "Transactions", value: transactions.length, icon: Activity, color: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30", isCount: true },
           ].map((stat, index) => (
-            <Card key={index} className="bg-slate-900/50 border-slate-800/50 backdrop-blur-sm shadow-lg">
-              <CardContent className="p-2.5 sm:p-4 text-center">
-                <div
-                  className={`w-9 h-9 sm:w-11 sm:h-11 mx-auto mb-2 sm:mb-3 rounded-lg sm:rounded-xl bg-${stat.color}-500/10 border border-${stat.color}-500/20 flex items-center justify-center backdrop-blur-sm flex-shrink-0`}
-                >
-                  <stat.icon className={`w-4 h-4 sm:w-5 sm:h-5 text-${stat.color}-400`} />
+            <Card key={index} className="bg-white/5 border border-white/10 backdrop-blur-sm shadow-lg hover:bg-white/10 transition-all">
+              <CardContent className="p-4 text-center">
+                <div className={`w-10 h-10 mx-auto mb-2 rounded-lg ${stat.color} border flex items-center justify-center backdrop-blur-sm flex-shrink-0`}>
+                  <stat.icon className={`w-5 h-5`} />
                 </div>
-                <p className="text-slate-400 text-xs mb-1 font-medium">{stat.label}</p>
-                <p className="text-white font-semibold text-sm sm:text-base">
+                <p className="text-gray-400 text-xs mb-1 font-medium">{stat.label}</p>
+                <p className="text-white font-bold text-base">
                   {stat.isCount ? stat.value : formatCurrency(stat.value)}
                 </p>
               </CardContent>
@@ -578,44 +566,44 @@ export default function Dashboard() {
         </div>
 
         {/* Transactions */}
-        <Card className="bg-slate-900/50 border-slate-800/50 backdrop-blur-sm shadow-xl">
-          <CardHeader className="pb-4 border-b border-slate-800/50">
-            <CardTitle className="text-white flex items-center gap-3 text-lg font-semibold">
-              <div className="p-2 bg-slate-700/30 rounded-lg border border-slate-600/30">
-                <Clock className="w-5 h-5 text-slate-400" />
+        <Card className="bg-white/5 border border-white/10 backdrop-blur-sm shadow-xl">
+          <CardHeader className="pb-4 border-b border-white/10">
+            <CardTitle className="text-white flex items-center gap-3 text-lg font-bold">
+              <div className="p-2.5 bg-cyan-500/20 rounded-lg border border-cyan-500/30">
+                <Clock className="w-5 h-5 text-cyan-400" />
               </div>
-              Transaction History
+              Recent Transactions
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {transactions.length === 0 ? (
               <div className="text-center py-16">
-                <div className="w-20 h-20 bg-slate-800/50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-700/50">
-                  <Clock className="w-10 h-10 text-slate-600" />
+                <div className="w-20 h-20 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/10">
+                  <Clock className="w-10 h-10 text-gray-600" />
                 </div>
-                <p className="text-slate-300 mb-1 font-medium">No transactions yet</p>
-                <p className="text-slate-500 text-sm">Your transaction history will appear here</p>
+                <p className="text-gray-300 mb-1 font-medium">No transactions yet</p>
+                <p className="text-gray-500 text-sm">Your transaction history will appear here</p>
               </div>
             ) : (
-              <div className="divide-y divide-slate-800/50">
+              <div className="divide-y divide-white/5">
                 {transactions
                   .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
                   .slice(0, 5)
                   .map((transaction) => (
                     <div
                       key={transaction.id}
-                      className="flex items-center gap-4 p-4 hover:bg-slate-800/30 transition-colors"
+                      className="flex items-center gap-4 p-4 hover:bg-white/5 transition-colors"
                     >
-                      <div className="p-2.5 bg-slate-800/50 rounded-xl flex-shrink-0 border border-slate-700/50">
+                      <div className="p-2.5 bg-white/10 rounded-lg flex-shrink-0 border border-white/10">
                         {getTransactionIcon(transaction.type, transaction.status)}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2 mb-1">
                           <div className="min-w-0 flex-1">
-                            <p className="text-white font-medium text-sm truncate">
+                            <p className="text-white font-semibold text-sm truncate">
                               {transaction.description || `${transaction.type} transaction`}
                             </p>
-                            <p className="text-slate-500 text-xs">
+                            <p className="text-gray-400 text-xs">
                               {new Date(transaction.created_at).toLocaleDateString("en-US", {
                                 month: "short",
                                 day: "numeric",
@@ -624,18 +612,18 @@ export default function Dashboard() {
                               })}
                             </p>
                             {transaction.recipient_account_name && (
-                              <p className="text-slate-500 text-xs truncate">
+                              <p className="text-gray-400 text-xs truncate">
                                 To: {transaction.recipient_account_name}
                               </p>
                             )}
                             {getPendingReason(transaction) && (
-                              <p className="text-amber-400 text-xs mt-1">⚠ {getPendingReason(transaction)}</p>
+                              <p className="text-yellow-400 text-xs mt-1">⚠ {getPendingReason(transaction)}</p>
                             )}
                           </div>
                           <div className="text-right flex-shrink-0">
                             <p
-                              className={`font-semibold text-sm mb-1.5 ${
-                                transaction.type === "credit" ? "text-emerald-400" : "text-rose-400"
+                              className={`font-bold text-sm mb-1.5 ${
+                                transaction.type === "credit" ? "text-green-400" : "text-red-400"
                               }`}
                             >
                               {transaction.type === "credit" ? "+" : "-"}
@@ -652,7 +640,7 @@ export default function Dashboard() {
                                 variant="ghost"
                                 onClick={() => handleRevertTransaction(transaction.id)}
                                 disabled={revertingTransactions.has(transaction.id)}
-                                className="text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 p-2 h-8"
+                                className="text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10 p-2 h-8 rounded"
                                 title="Revert Transaction"
                               >
                                 {revertingTransactions.has(transaction.id) ? (
@@ -670,7 +658,7 @@ export default function Dashboard() {
                               setSelectedTransaction(transaction)
                               setShowReceiptModal(true)
                             }}
-                            className="text-slate-400 hover:text-slate-200 hover:bg-slate-700/30 p-2 flex items-center gap-1.5 h-8"
+                            className="text-gray-400 hover:text-cyan-400 hover:bg-cyan-500/10 p-2 flex items-center gap-1.5 h-8 rounded transition-colors"
                           >
                             <Receipt className="w-3.5 h-3.5" />
                             <span className="text-xs font-medium">Receipt</span>
